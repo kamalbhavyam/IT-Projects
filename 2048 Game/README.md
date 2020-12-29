@@ -24,6 +24,7 @@
 - E to lookahead into future possibilities
 - P to print entire history upto current state
 - I to print state information
+- F to let Expectimax Agent play the game
 
 ### Implementation Details
 
