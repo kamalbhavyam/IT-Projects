@@ -5,11 +5,15 @@
 
 ### File Structure
 
-    /main.py    "Main Game Code"
+    /game.py    "Main Game Code"
     
     /gui.py     "Define GUI elements"
 
     /states.py  "Define History and State Node structure"
+
+    /main.py    "Driver Function"
+
+    /ai.py      "Expectimax Agent to autorun"
 
 ### Actions
 
