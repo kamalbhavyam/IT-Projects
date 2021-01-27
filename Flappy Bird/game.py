@@ -3,6 +3,7 @@ import neat
 import time
 import os
 import random
+import pickle
 pygame.font.init()
 
 GEN = -1
@@ -167,6 +168,7 @@ def draw_window(window,birds,pipes,base,score,GEN):
 
     for bird in birds:
         bird.draw(window)
+
     pygame.display.update()
 
 def main(genomes, config):
@@ -195,6 +197,7 @@ def main(genomes, config):
     run = True
     while run:
         clock.tick(30)
+        
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
                 run = False
@@ -262,8 +265,12 @@ def run(config):
     p.add_reporter(neat.StdOutReporter(True))
     stat = neat.StatisticsReporter()
     p.add_reporter(stat)
+    checkpointer = neat.Checkpointer()
+    p.add_reporter(checkpointer)
 
     winner = p.run(main,50)
+
+    print('\nBest genome:\n{!s}'.format(winner))
 
 if __name__ == "__main__":
     local_dir = os.path.dirname(__file__)
