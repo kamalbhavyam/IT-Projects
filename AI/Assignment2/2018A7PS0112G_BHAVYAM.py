@@ -467,9 +467,9 @@ def main():
         rooms.append(ag.FindCurrentLocation())
         print('curLoc',ag.FindCurrentLocation())
         if tuple(ag.FindCurrentLocation()) in visited.keys():
-            visited[tuple(ag.FindCurrentLocation())]+=1;
+            visited[tuple(ag.FindCurrentLocation())]+=1
         else:
-            visited[tuple(ag.FindCurrentLocation())]=1;
+            visited[tuple(ag.FindCurrentLocation())]=1
         x=ag.FindCurrentLocation()[0]
         y=ag.FindCurrentLocation()[1]
         # print('Percept [breeze, stench] :',ag.PerceiveCurrentLocation())

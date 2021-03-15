@@ -1,14 +1,15 @@
 import random
 import functools
+import matplotlib.pyplot as plt
 import time
 import numpy
 
 def initpopulation():
-    popsize = 100
-    initpop = set({})
+    popsize = 20
+    initpop = []
     for _ in range(popsize):
-        inity = numpy.random.permutation(8)
-        initpop.add(numpy.array2string(inity,separator='')[1:9])    
+        inity = [random.randint(0,7)]*8
+        initpop.append(''.join([str(elem) for elem in inity]))    
     return initpop
 
 def fitness(instance):
@@ -19,7 +20,7 @@ def fitness(instance):
                 if gene!=ogene:
                     if (ogene>gene and int(ogene)-(oind-ind)!=int(gene)) or (ogene<gene and int(ogene)+(oind-ind)!=int(gene)):
                         nonconflictpairs+=1
-    return nonconflictpairs
+    return nonconflictpairs+1
 
 def reproduce(x,y):
     c = random.randint(0,7)
@@ -35,101 +36,123 @@ def compare(chrom1,chrom2):
     return (fitness(chrom2)-fitness(chrom1))
 
 def survive(n,population,fitness):
-    poplist = list(population)
+    popunique = numpy.unique(population)
+    if len(popunique)>n:
+        poplist = list(popunique)
+    else:
+        poplist = population
     poplist.sort(key=functools.cmp_to_key(compare))
     newpoplist=poplist[0:int(0.85*n)+1]
     for _ in range(int(0.15*n)):
         newpoplist.append(random.choice(poplist[int(0.85*n)+1:]))
-    return set(newpoplist)
+    return newpoplist
 
 def pickrand(population,fitness):
-    poplist=list(population)
-    sumtot=0
-    maxfit=fitness(poplist[0])
-    for elem in poplist:
-        ftemp=fitness(elem)
-        sumtot+=ftemp
-        maxfit=max(maxfit,ftemp)
+    maxfit=max([fitness(elem) for elem in population])
     weights=[]
-    for elem in poplist:
+    for elem in population:
         weights.append(fitness(elem)/maxfit)
-    
-    return random.choices(poplist,weights)[0]
+    return random.choices(population,weights)[0]
 
 def genalgo(population,fitness):
+    gagraphx=[]
+    gagraphy=[]
     generation=0
     doneflag=False
     while(True) and not doneflag:
         generation+=1
-        print(generation)
-        newpop = set({})
+        newpop = []
 
         n = len(population)
-        while len(newpop)<100:
+        for _ in range(n):
             x = pickrand(population,fitness)
             y = pickrand(population,fitness)
             while y==x:
                 y = pickrand(population,fitness)
             
-            print("Reproducing ",x, "and ",y)
-            # child=reproduce(xinstance,yinstance)
             child=reproduce(x,y)
-            if fitness(child)==28:
+            if fitness(child)==29:
                 print("found",child)
+                print(generation)
+                gagraphx.append(generation)
+                gagraphy.append(29)
                 doneflag=True
                 break
 
             m = random.random()
             if m<=0.03:
-                print("Mutating ",child)
                 child=mutate(child)
-            if fitness(child)==28:
+            if fitness(child)==29:
                 print("bruh",child)
+                print(generation)
+                gagraphx.append(generation)
+                gagraphy.append(29)
                 doneflag=True
                 break
-            # print("child fitness: ",fitness(child), child)
-            # print("max ",max([fitness(elem) for elem in population]))
-            newpop.add(child)
+            newpop.append(child)
         population = newpop
-        # print("max ",max([fitness(elem) for elem in population]))
-        print(numpy.mean([fitness(elem) for elem in population]))
+
+        fitmax=max([fitness(elem) for elem in population])
+        gagraphx.append(generation)
+        gagraphy.append(fitmax)
+        if generation%100==0:
+            print(generation)
+            print("max ",fitmax)
+            print(numpy.mean([fitness(elem) for elem in population]))
+    return gagraphx,gagraphy
 
 def genalgobetter(population,fitness):
     generation=0
+    gabgraphx=[]
+    gabgraphy=[]
     doneflag=False
     while(True) and not doneflag:
         generation+=1
-        print(generation)
-        newpop = set({})
+        newpop = []
 
         n = len(population)
-        while len(newpop)<100:
+        while len(newpop)<20:
             x = pickrand(population,fitness)
             y = pickrand(population,fitness)
             while y==x:
                 y = pickrand(population,fitness)
             
-            print("Reproducing ",x, "and ",y)
+            # print("Reproducing ",x, "and ",y)
             child=reproduce(x,y)
-            if fitness(child)==28:
+            if fitness(child)==9:
                 print("found",child)
                 print(generation)
+                gabgraphx.append(generation)
+                gabgraphy.append(9)
                 doneflag=True
                 break
 
             m = random.random()
             if m<=0.1:
-                print("Mutating ",child)
+                # print("Mutating ",child)
                 child=mutate(child)
-            if fitness(child)==28:
+            if fitness(child)==9:
                 print("bruh",child)
                 print(generation)
+                gabgraphx.append(generation)
+                gabgraphy.append(9)
                 doneflag=True
                 break
-            newpop.add(child)
-        population.update(newpop)
-        population=survive(100,population,fitness)
+            newpop.append(child)
+        population.extend(newpop)
+        population=survive(20,population,fitness)
+        fitmax=max([fitness(elem) for elem in population])
+        gabgraphx.append(generation)
+        gabgraphy.append(fitmax)
+    return gabgraphx,gabgraphy
 
 startpop=initpopulation()
-genalgo(startpop,fitness)
-genalgobetter(startpop,fitness)
+x1,y1 = genalgobetter(startpop,fitness)
+plt.plot(x1,y1, label = 'better')
+x2,y2 = genalgo(startpop,fitness)
+plt.plot(x2,y2 , label = 'original')
+plt.show()
+# plt.plot(genalgobetter(startpop,fitness)[0],genalgobetter(startpop,fitness)[1])
+# plt.show()
+# plt.plot(genalgo(startpop,fitness)[0],genalgo(startpop,fitness)[1])
+# plt.show()
